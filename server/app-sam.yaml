@@ -1,0 +1,178 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Description: "Backend services and services for fuel-finder (team 4)"
+
+Parameters:
+  VpcId:
+    Type: "AWS::EC2::VPC::Id"
+    Description: "VPCId of Virtual Private Cloud (VPC)."
+    Default: ""
+
+  VpcSubnet:
+    Description: "SubnetId in VPC"
+    Type: "AWS::EC2::Subnet::Id"
+    Default: ""
+
+Resources:
+  
+  #
+  # List Stations
+  #
+  ListStationsFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: "stations.list"
+      Runtime: "nodejs4.3"
+      CodeUri: "api/"
+      Policies: "AWSLambdaVPCAccessExecutionRole"
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref FunctionSecurityGroup
+        SubnetIds:
+          - ""
+      Timeout: 6
+      Environment:
+        Variables:
+          ELASTICACHE_HOST: "teamfourelasticache.lethum.ng.0001.use1.cache.amazonaws.com"
+          ELASTICACHE_PORT: 6379
+          SEARCH_RADIUS: 50
+          SEARCH_RADIUS_UNITS: "mi"  # or 'km', 'm', 'ft'
+          RESULT_COUNT: 10
+          DYNAMO_DB_TABLE: "leidalk-alt-fuel-stations"
+          REGION: "us-east-1"
+          WAYPOINT_LAMBDA: "Group4_FuelFinder_GetWaypoint"
+      Events:
+        ListStations:
+          Type: "Api"
+          Properties:
+            Path: "/stations"
+            Method: "GET"
+
+  #
+  # Setup Data -- FOR SAMPLE ONLY
+  #
+  SetupStationsFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: "stations.setup"
+      Runtime: "nodejs4.3"
+      CodeUri: "api/"
+      Policies: "AmazonDynamoDBFullAccess"
+      Timeout: 10
+      Environment:
+        Variables:
+          ELASTICACHE_HOST: "teamfourelasticache.lethum.ng.0001.use1.cache.amazonaws.com"
+          ELASTICACHE_PORT: 6379
+          DYNAMO_DB_TABLE: "leidalk-alt-fuel-stations"
+          REGION: "us-east-1"
+      Events:
+        SetupStations:
+          Type: "Api"
+          Properties:
+            Path: "/stations/setup"
+            Method: "GET"
+
+  #
+  # Stream Processor
+  #
+  StreamProcessorFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: "index.handler"
+      Runtime: "nodejs4.3"
+      CodeUri: "stream/"
+      Policies: "AWSLambdaVPCAccessExecutionRole"
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref FunctionSecurityGroup
+        SubnetIds:
+          - !ImportValue "fuel-finder-private-subnet"
+      Environment:
+        Variables:
+          ELASTICACHE_HOST:
+            Fn::GetAtt: ["ECCluster", "RedisEndpoint.Address"]
+          ELASTICACHE_PORT:
+            Fn::GetAtt: ["ECCluster", "RedisEndpoint.Port"]
+      Events:
+        Stream:
+          Type: "DynamoDB"
+          Properties:
+            Stream: !GetAtt DDBTable.StreamArn
+            StartingPosition: "TRIM_HORIZON"
+
+  #
+  # DynamoDB Table
+  #
+  DDBTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "uuid"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "uuid"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: "NEW_AND_OLD_IMAGES"
+      TableName: "fuel-finder"
+      
+
+  #
+  # ElastiCache
+  #
+  ECCluster:
+    Type: "AWS::ElastiCache::CacheCluster"
+    Properties:
+      Engine: "redis"
+      CacheNodeType: "cache.t2.micro"
+      NumCacheNodes: 1
+      VpcSecurityGroupIds:
+        - !GetAtt ECSecurityGroup.GroupId
+      CacheSubnetGroupName: !Ref ECSubnetGroup
+
+  ECSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "fuel-finder - ElastiCache Security Group"
+      VpcId: !ImportValue "fuel-finder-vpc"
+      SecurityGroupIngress:
+        -
+          IpProtocol: "tcp"
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !Ref FunctionSecurityGroup
+
+  ECSubnetGroup:
+    Type: "AWS::ElastiCache::SubnetGroup"
+    Properties:
+      Description: "fuel-finder - ElastiCache Subnet Group"
+      SubnetIds:
+        - !ImportValue "fuel-finder-private-subnet"
+
+  FunctionSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "fuel-finder - Lambda Function Security Group"
+      VpcId: !ImportValue "fuel-finder-vpc"
+
+
+#
+# Outputs
+#
+Outputs:
+  ApiDomain:
+    Description: "API Domain"
+    Value: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+  CacheEndpoint:
+    Description: "ElastiCache Endpoint"
+    Value:
+      Fn::GetAtt: ["ECCluster", "RedisEndpoint.Address"]
+
+

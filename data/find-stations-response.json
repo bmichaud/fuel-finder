@@ -1,0 +1,51 @@
+{"origin":
+	{
+		"zip":"06551",
+		"latitude":32.367096,
+		"longitude":-86.267286,
+	},
+	"fuel_stations":[
+	{
+		"id":17,
+		"fuel_type_code":"CNG",
+		"station_name":"Alagasco Montgomery Operations Center",
+		"station_phone":null,
+		"latitude":32.367096,
+		"longitude":-86.267286,
+		"city":"Montgomery",
+		"state":"AL",
+		"street_address":"2951 Chestnut St",
+		"zip":"36107",
+		"distance":3.2,
+		"distance_units":"mi"
+	},
+	{
+		"id":42,
+		"fuel_type_code":"CNG",
+		"station_name":"Clean Energy - PS Energy - Atlanta",
+		"station_phone":"866-809-4869",
+		"latitude":33.746005,
+		"longitude":-84.39896,
+		"city":"Atlanta",
+		"state":"GA",
+		"street_address":"340 Whitehall St",
+		"zip":"30303",
+		"distance":2.4,
+		"distance_units":"mi"
+	},
+	{
+		"id":45,
+		"fuel_type_code":"CNG",
+		"station_name":"Metropolitan Atlanta Rapid Transit Authority",
+		"station_phone":null,
+		"latitude":33.8241058,
+		"longitude":-84.3686323,
+		"city":"Atlanta",
+		"state":"GA",
+		"street_address":"2424 Piedmont Rd NE",
+		"zip":"30324",
+		"distance":0.5,
+		"distance_units":"mi"
+	}
+	]
+} 

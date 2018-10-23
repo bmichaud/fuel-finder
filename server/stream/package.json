@@ -1,0 +1,11 @@
+{
+  "name": "fuel-finder-stream",
+  "version": "1.0.0",
+  "description": "Lambda function to support fuel-finder DynamoDB Stream",
+  "main": "index.js",
+  "author": "ben.a.michaud@lmco.com",
+  "license": "ISC",
+  "dependencies": {
+    "redis": "^2.6.5"
+  }
+}
