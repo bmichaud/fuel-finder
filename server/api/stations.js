@@ -9,14 +9,16 @@
 
  */
 
-//----
-const elasticacheHost = process.env.ELASTICACHE_HOST;
-const elasticachePort = process.env.ELASTICACHE_PORT;
-const listSearchRadius = process.env.SEARCH_RADIUS;
-const listSearchRadiusUnits = process.env.SEARCH_RADIUS_UNITS;
-const listResultCount = process.env.RESULT_COUNT;
-const region = process.env.REGION;
-const dynamoDbTable = process.env.DYNAMO_DB_TABLE;
+const dataUrl = "https://s3.amazonaws.com/leidalk-pipeline-capstone/alt_fuel_stations.json";
+const region = "us-east-1";
+const elasticacheHost = "teamfourelasticache.lethum.ng.0001.use1.cache.amazonaws.com";
+const elasticachePort = "6379";
+const waypointLambda = "Group4_FuelFinder_GetWaypoint";
+const listSearchRadius = 50;
+const listSearchRadiusUnits = "mi";
+const listResultCount = 10;
+const dynamoDbTable = "leidalk-alt-fuel-stations";
+
 
 const aws = require('aws-sdk');
 aws.config.update({region: region});
@@ -61,7 +63,6 @@ module.exports.list = (event, context, callback) => {
     // var fuelType = event.fuel_type_code;
     let latitude = null;
     let longitude = null;
-    const waypointLambda = process.env.WAYPOINT_LAMBDA;
 
     if (zip == null || zip === undefined) {
         callback(null, buildResponse(400, {"message": "Missing required parameter: ZIP"}));
@@ -267,7 +268,6 @@ const updateRecord = (client, id, record) => {
  * Sets up the data in the elasticache redis data structure from the JSON data file.
  */
 module.exports.setup = (event, context, callback) => {
-    const dataUrl = process.env.DATA_URL;
 
     getStationData(dataUrl)
         .then((data) => {
