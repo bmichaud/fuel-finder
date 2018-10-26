@@ -115,6 +115,7 @@ module.exports.list = (event, context, callback) => {
             radiusUnits,
             'WITHDIST',
             'WITHCOORD',
+            'ASC',
             'COUNT',
             listResultCount], (error, reply) => {
             client.quit();

@@ -1,0 +1,12 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Lambda functions to support fuel-finder API",
+  "main": "index.js",
+  "author": "ben.a.michaud@lmco.com",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.9.0",
+    "geolib": "^2.0.24"
+  }
+}
