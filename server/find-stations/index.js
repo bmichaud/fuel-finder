@@ -8,7 +8,6 @@
 
  */
 
-// const dataUrl = "https://s3.amazonaws.com/leidalk-pipeline-capstone/alt_fuel_stations.json";
 // const dataUrl = "https://s3.amazonaws.com/sic-team-4-fuel-finder/alt_fuel_stations.json";
 // const region = "us-east-1";
 // const waypointLambda = "Group4_FuelFinder_GetWaypoint";
@@ -105,14 +104,14 @@ module.exports.list = (event, context, callback) => {
                             return getStationsInRadius(data, coordinates, radiusInMeters, radiusUnits);
                         })
                         .then((stations) => {
-
+                            stations.length = Math.min(stations.length, listResultCount);
                             let finalResult = {
                                 origin: {
                                     zip: `${zip}`,
                                     latitude: coordinates.latitude,
                                     longitude: coordinates.longitude
                                 },
-                                fuel_stations: stations.length = Math.min(stations.length, listResultCount)
+                                fuel_stations: stations
                             };
                             console.log(finalResult);
                             callback(null, buildResponse(200, finalResult));
