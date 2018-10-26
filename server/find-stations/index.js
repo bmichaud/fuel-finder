@@ -9,12 +9,18 @@
  */
 
 // const dataUrl = "https://s3.amazonaws.com/leidalk-pipeline-capstone/alt_fuel_stations.json";
-const dataUrl = "https://s3.amazonaws.com/sic-team-4-fuel-finder/alt_fuel_stations.json";
-const region = "us-east-1";
-const waypointLambda = "Group4_FuelFinder_GetWaypoint";
-const listSearchRadius = 50;
-const listSearchRadiusUnits = "mi";
-const listResultCount = 10;
+// const dataUrl = "https://s3.amazonaws.com/sic-team-4-fuel-finder/alt_fuel_stations.json";
+// const region = "us-east-1";
+// const waypointLambda = "Group4_FuelFinder_GetWaypoint";
+// const listSearchRadius = 50;
+// const listSearchRadiusUnits = "mi";
+// const listResultCount = 10;
+const dataUrl = process.env.DATA_URL;
+const region = process.env.REGION;
+const waypointLambda = process.env.WAYPOINT_LAMBDA;
+const listSearchRadius = process.env.SEARCH_RADIUS;
+const listSearchRadiusUnits = process.env.SEARCH_RADIUS_UNITS;
+const listResultCount = process.env.RESULT_COUNT;
 
 
 const aws = require('aws-sdk');
