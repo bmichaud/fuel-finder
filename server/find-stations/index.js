@@ -18,9 +18,9 @@
 const dataUrl = process.env.DATA_URL;
 const region = process.env.REGION;
 const waypointLambda = process.env.WAYPOINT_LAMBDA;
-const listSearchRadius = process.env.SEARCH_RADIUS;
+const listSearchRadius = Number(process.env.SEARCH_RADIUS);
 const listSearchRadiusUnits = process.env.SEARCH_RADIUS_UNITS;
-const listResultCount = process.env.RESULT_COUNT;
+const listResultCount = Number(process.env.RESULT_COUNT);
 
 
 const aws = require('aws-sdk');
