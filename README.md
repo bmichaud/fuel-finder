@@ -39,14 +39,12 @@ It was done purely as an internal training exercise and is not for public consum
                 ```
                 * Content-Type: application/json
         * Environment Variables:
-            | Name                  | Value                                                                 |
-            | ----------------------| ----------------------------------------------------------------------|
-            | DATA_URL              | https://s3.amazonaws.com/sic-team-4-fuel-finder/alt_fuel_stations.json|
-            | REGION                | us-east-1                                                             |
-            | RESULT_COUNT          | 15                                                                    |
-            | SEARCH_RADIUS         | 50                                                                    |
-            | SEARCH_RADIUS_UNITS   | mi                                                                    |
-            | WAYPOINT_LAMBDA       | Group4_FuelFinder_GetWaypoint                                         |
+            * DATA_URL: https://s3.amazonaws.com/sic-team-4-fuel-finder/alt_fuel_stations.json
+            * REGION: us-east-1
+            * RESULT_COUNT: 15
+            * SEARCH_RADIUS: 50
+            * SEARCH_RADIUS_UNITS: mi
+            * WAYPOINT_LAMBDA: Group4_FuelFinder_GetWaypoint
 
     * /getroute GET maps to the get-route lambda (currently called Group4_FuelFinder_GetRoute)
         * Integration Request
