@@ -32,16 +32,17 @@ const geolib = require('geolib');
 //---- Shared Functions ----
 const buildResponse = (statusCode, body) => {
 
-    return {
-        statusCode: statusCode,
-        body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"  // Equivalent to Enabling COARS
-        },
-        isBase64Encoded: false
-    };
+    // return {
+    //     isBase64Encoded: false,
+    //     statusCode: statusCode,
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //         "Access-Control-Allow-Origin": "*"  // Equivalent to Enabling CORS
+    //     },
+    //     body: JSON.stringify(body)
+    // };
 
+    return JSON.stringify(body);
 };
 
 
@@ -55,7 +56,7 @@ module.exports.list = (event, context, callback) => {
     let zip = event.zip;
 
     if (zip == null || zip === undefined) {
-        callback(null, buildResponse(400, {"message": "Missing required parameter: ZIP"}));
+        callback(null, buildResponse(400, {"message": "Missing required parameter: zip"}));
     } else {
         let params = {postalCode: `${zip}`};
         lambda.invoke({
@@ -92,7 +93,7 @@ module.exports.list = (event, context, callback) => {
                     }
 
                     let radiusUnits = event.radius_units;
-                    if (radiusUnits == null || radiusUnits === undefined || (radiusUnits.trim() !== 'km') || (radiusUnits.trim() !== 'mi')) {
+                    if (radiusUnits == null || radiusUnits === undefined || !unitsRegex.test(radiusUnits.trim())) {
                         radiusUnits = listSearchRadiusUnits;
                     } else {
                         radiusUnits = radiusUnits.trim();
@@ -114,7 +115,17 @@ module.exports.list = (event, context, callback) => {
                                 fuel_stations: stations
                             };
                             console.log(finalResult);
-                            callback(null, buildResponse(200, finalResult));
+                            // return(buildResponse(200, finalResult));
+                            callback(null, finalResult);
+                            // callback(null, {
+                            //     "isBase64Encoded": false,
+                            //     "statusCode": 200,
+                            //     "headers": {
+                            //         "Content-Type": "application/json",
+                            //         "Access-Control-Allow-Origin": "*"
+                            //     },
+                            //     "body": JSON.stringify(finalResult)
+                            // });
                         })
                         .catch((error) => {
                             console.error(error);
@@ -129,6 +140,7 @@ module.exports.list = (event, context, callback) => {
 };
 
 const posIntRegex = /^\d+$/;
+const unitsRegex = /^(km|mi)$/;
 
 function isPosInt(n) {
     let isPosInt = false;
